@@ -1,5 +1,7 @@
 import math, sys, random
 from direct.showbase.ShowBase import ShowBase
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher, CollisionNode, CollisionSphere
+
 
 class MyApp(ShowBase):
 
@@ -16,6 +18,26 @@ class MyApp(ShowBase):
 
         self.camera.setPos(0.0, 0.0, 250.0)
         self.camera.setHpr(0.0, -90.0, 0.0)
+
+        self.parentCnode = self.parent.attachNewNode(CollisionNode("pcnode"))
+        self.parentCnode.node().addSolid(CollisionSphere(0, 0, 0, 1.8))
+
+        self.fighterCnode = self.fighter.attachNewNode(CollisionNode("fcnode"))
+        self.fighterCnode.node().addSolid(CollisionSphere(0, 0, 0, 1.8))
+
+        self.traverser = CollisionTraverser()
+        self.traverser.traverse(self.render)
+
+        self.pusher = CollisionHandlerPusher()
+        self.pusher.addCollider(self.fighterCnode, self.fighter)
+
+        self.traverser.addCollider(self.fighterCnode, self.pusher)
+        self.cTrav = self.traverser
+        self.traverser.showCollisions(self.render)
+
+        self.parentCnode.show()
+        self.fighterCnode.show()
+        
 
         x = 0
         for i in range(100):
